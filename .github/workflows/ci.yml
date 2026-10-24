@@ -2,7 +2,7 @@
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
 
-name: CI
+name: .NET CI
 
 on:
   push:
@@ -10,30 +10,29 @@ on:
       - develop
       - 'feature/**'
 
-  pull_request:
-    branches:
-      - develop
-      - main
-
 jobs:
   build-and-test:
-    name: Build and Test
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup .NET 6
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: |
+            6.0.x
+            8.0.x
 
       - name: Restore dependencies
         run: dotnet restore Homies.sln
 
       - name: Build application
         run: dotnet build Homies.sln --configuration Debug --no-restore
+
+      - name: Run all tests
+        run: dotnet test Homies.sln --configuration Debug --no-build --verbosity normal
 
       - name: Run unit and integration tests
         run: dotnet test Homies.sln --configuration Debug --no-build
